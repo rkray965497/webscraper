@@ -1,0 +1,54 @@
+import requests
+from bs4 import BeautifulSoup
+
+# --- Configuration ---
+# **NOTE:** Replace this URL with the actual news website you want to scrape.
+TARGET_URL = 'http://example.com/news' 
+# **NOTE:** Inspect the website's HTML to find the correct tag and class 
+# for headlines. Common tags are <h2>, <h3>, or <a>.
+HEADLINE_TAG = 'h2'
+HEADLINE_CLASS = 'headline-link' 
+OUTPUT_FILENAME = 'top_headlines.txt'
+
+def scrape_headlines():
+    """
+    Fetches, parses, and saves headlines from a target URL.
+    """
+    try:
+        # 1. Use requests to fetch HTML
+        print(f"Fetching content from: {TARGET_URL}")
+        # Setting a User-Agent is often good practice to mimic a real browser
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        response = requests.get(TARGET_URL, headers=headers)
+        response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+
+        # Use BeautifulSoup to parse the HTML content
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # 2. Use BeautifulSoup to parse <h2> or title tags
+        # Finds all elements matching the specified tag and class
+        headlines = soup.find_all(HEADLINE_TAG, {'class': HEADLINE_CLASS})
+        
+        # Extract the text from the found tags
+        headline_texts = [headline.get_text(strip=True) for headline in headlines]
+        
+        if not headline_texts:
+            print("❗ Warning: No headlines found with the specified tag and class.")
+            print(f"Please check the website's HTML source for the correct selector (currently: <{HEADLINE_TAG} class='{HEADLINE_CLASS}'>).")
+            return
+
+        # 3. Save the titles in a .txt file
+        with open(OUTPUT_FILENAME, 'w', encoding='utf-8') as f:
+            for title in headline_texts:
+                f.write(title + '\n')
+        
+        print(f"\n Success! Scraped {len(headline_texts)} headlines.")
+        print(f"Headlines saved to **{OUTPUT_FILENAME}**.")
+
+    except requests.exceptions.RequestException as e:
+        print(f" An error occurred during the HTTP request: {e}")
+    except Exception as e:
+        print(f" An unexpected error occurred: {e}")
+
+if __name__ == "__main__":
+    scrape_headlines()
