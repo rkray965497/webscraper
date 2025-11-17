@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 
 # --- Configuration ---
 # **NOTE:** Replace this URL with the actual news website you want to scrape.
-TARGET_URL = 'http://example.com/news' 
+TARGET_URL = 'https://google.com' 
 # **NOTE:** Inspect the website's HTML to find the correct tag and class 
 # for headlines. Common tags are <h2>, <h3>, or <a>.
 HEADLINE_TAG = 'h2'
